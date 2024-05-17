@@ -23,7 +23,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing;
 using System.Diagnostics;
 using TaxiDispetcher5;
-//то что надо
+
 namespace TaxiDispetcher5
 {
     public partial class MainWindow : Window
@@ -63,7 +63,6 @@ namespace TaxiDispetcher5
             }
         }
 
-        
         public decimal Gpa
         {
             get => Gpa;
@@ -77,7 +76,6 @@ namespace TaxiDispetcher5
             }
         }
 
-        
         public string Spec
         {
             get => Spec;
@@ -110,6 +108,19 @@ public class MainViewModel : INotifyPropertyChanged
     public ObservableCollection<Zap> Zaps { get; private set; }
     public ICommand SearchCommand { get; private set; }
     public ICommand CancelSearchCommand { get; private set; }
+    public ICommand DeleteCommand { get; private set; }
+    public ICommand EditCommand { get; private set; }
+
+    private Zap _selectedZap;
+    public Zap SelectedZap
+    {
+        get => _selectedZap;
+        set
+        {
+            _selectedZap = value;
+            OnPropertyChanged(nameof(SelectedZap));
+        }
+    }
 
     private IEnumerable<Zap> _filteredApplicants;
     public IEnumerable<Zap> FilteredApplicants
@@ -130,6 +141,8 @@ public class MainViewModel : INotifyPropertyChanged
 
         SearchCommand = new RelayCommand(SearchApplicants, _ => true);
         CancelSearchCommand = new RelayCommand(CancelSearch, _ => true);
+        DeleteCommand = new RelayCommand(DeleteApplicant, _ => true);
+        EditCommand = new RelayCommand(EditApplicant, _ => true);
     }
 
     private void SearchApplicants(object searchTerm)
@@ -143,6 +156,26 @@ public class MainViewModel : INotifyPropertyChanged
     private void CancelSearch(object _)
     {
         FilteredApplicants = Zaps;
+    }
+
+    private void DeleteApplicant(object obj)
+    {
+        var zapId = (int)obj;
+        var zap = _context.Zaps.Find(zapId);
+        if (zap != null)
+        {
+            _context.Zaps.Remove(zap);
+            _context.SaveChanges();
+        }
+    }
+
+    private void EditApplicant(object obj)
+    {
+        var zap = obj as Zap;
+        if (zap != null)
+        {
+            // Edit the selected Zap here
+        }
     }
 
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
